@@ -20,8 +20,7 @@
 
 let sectionDivList = document.getElementsByClassName("landing__container");
 let currentSection;
-let navbarCompleted;
-let sectionNavBarCounter = 0;
+let sectionElemList = [];
 const navbarUlElem = document.getElementById("navbar__list");
 let navItemStringList = [];
 let navItemElemList = [];
@@ -33,16 +32,24 @@ let navItemElemList = [];
  */
 
 
+
+// helper to return true f the element is in the viewport, otherwise returns false
 function isInViewport(element) {
+
+    // in rect the position and releative distance to 0 point of view port coordination system is stored
     const rect = element.getBoundingClientRect();
     return (
+        // first two conditions are true if element is on the screen to the right and down further away from zero point than 0
         rect.top >= 0 &&
         rect.left >= 0 &&
+        // last two are true when element is not further away then the height/width of the browser window and therefore is visable on screen
         rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
         rect.right <= (window.innerWidth || document.documentElement.clientWidth)
     );
 }
 
+
+// tests all content sections of the page and returns which one of them is in the view port, if none is visable, null is returned
 function getSectionInViewport() {
     for (const containerInSection of sectionDivList) {
 
@@ -58,10 +65,10 @@ function getSectionInViewport() {
 
 
     }
-    console.log('NULL will be returned: ');
     return null;
-
 }
+
+
 
 function intervalHelper() {
 
@@ -93,12 +100,12 @@ function buildNavBar() {
 
             const sectionHeadingContent = sectionElem.querySelector("h2").innerHTML;
 
-            const textOfParagraph = document.createTextNode(sectionHeadingContent);
+            const textOfListBullet = document.createTextNode(sectionHeadingContent);
 
-            ulBullet.appendChild(textOfParagraph);
+            ulBullet.appendChild(textOfListBullet);
 
 
-            if (typeof navItemStringList === "undefined" || !navItemStringList.includes(sectionHeadingContent)) {
+            if (typeof navItemStringList === "undefined" || !navItemElemList.includes(ulBullet)) {
 
                 navItemStringList.push(sectionHeadingContent);
                 navItemElemList.push(ulBullet);
@@ -180,8 +187,7 @@ function checkFocusToUpdateSectionDesign() {
         let index = navItemStringList.indexOf(headingToSearchForInNavBarLinks);
         if (index !== -1) {
             console.log(index);
-            navItemElemList[index].classList.remove("menu__link");
-            navItemElemList[index].classList.add("menu__link:hover");
+            navItemElemList[index].classList.add("menu__link_active");
         }
 
     }
@@ -190,7 +196,7 @@ function checkFocusToUpdateSectionDesign() {
 
         const section = sectionDiv.parentElement;
 
-        if (section !== sectionElem) {
+        if (section !== sectionElem && section.classList.contains("active-section-body")) {
 
             console.log("remove from " + section.id);
             section.classList.remove("active-section-body");
@@ -200,8 +206,7 @@ function checkFocusToUpdateSectionDesign() {
             let index = navItemStringList.indexOf(headingToSearchForInNavBarLinks);
             if (index >= 0) {
                 console.log(index);
-                navItemElemList[index].classList.add("menu__link");
-                navItemElemList[index].classList.remove("menu__link:hover");
+                navItemElemList[index].classList.remove("menu__link_active");
             }
 
         }
@@ -212,6 +217,38 @@ function checkFocusToUpdateSectionDesign() {
 
 
 // Scroll to anchor ID using scrollTO event
+
+
+
+//
+
+function checkScrolling() {
+
+    // Clear our timeout throughout the scroll
+    console.log("still scrolling");
+
+
+    setTimeout(hideNavBarScrolling);
+
+
+    // Set a timeout to run after scrolling ends
+    isScrolling = setTimeout(function() {
+
+    }, 600);
+
+}
+
+// hide navbar while scrolling
+
+function hideNavBarScrolling() {
+    const header = document.querySelector(".page__header");
+    const nav = document.querySelector(".navbar__menu");
+
+    nav.classList.add("hidden");
+    header.classList.add("hidden");
+
+
+}
 
 
 /**
@@ -231,6 +268,47 @@ document.addEventListener("DOMContentLoaded", buildNavBar);
 
 // Scroll to section on link click
 
-// Set sections as active
 
-document.addEventListener("DOMContentLoaded", intervalHelper);
+function respondToTheClick(evt) {
+    console.log('A paragraph was clicked: ' + evt.target.textContent);
+
+    const index = navItemStringList.indexOf(evt.target.textContent);
+
+
+    sectionElemList = document.getElementsByTagName("section");
+
+    var element_to_scroll_to = sectionElemList[index];
+    // Basically `element_to_scroll_to` just have to be a reference
+    // to any DOM element present on the page
+    // Then:
+    element_to_scroll_to.scrollIntoView();
+}
+
+
+
+document.querySelector(".navbar__menu").addEventListener('click', respondToTheClick);
+
+
+// Set sections as active
+var timer = null;
+window.addEventListener('scroll', function() {
+    if (timer !== null) {
+        clearTimeout(timer);
+    }
+    timer = setTimeout(function() {
+        // do something
+        // Run the callback
+        console.log("stopped scrolling");
+        const header = document.querySelector(".page__header");
+        const nav = document.querySelector(".navbar__menu");
+
+        nav.classList.remove("hidden");
+        header.classList.remove("hidden");
+        setTimeout(intervalHelper);
+    }, 150);
+}, false);
+
+
+
+// Listen for scroll events
+window.addEventListener('scroll', checkScrolling, false);

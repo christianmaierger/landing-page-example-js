@@ -80,10 +80,6 @@ section {
     display: inline-block;
 }
 
-.navbar__menu .hidden li {
-    display: none;
-}
-
 .navbar__menu .menu__link {
     display: block;
     padding: 1em;
@@ -98,6 +94,12 @@ section {
     transition: ease 0.3s all;
 }
 
+.navbar__menu .menu__link_active {
+    background: #333;
+    color: rgb(255, 255, 255, .1);
+    transition: ease 0.3s all;
+}
+
 
 /* Header Styles */
 
@@ -107,6 +109,10 @@ section {
     top: 0;
     width: 100%;
     z-index: 5;
+}
+
+.page__header .hidden {
+    display: none;
 }
 
 
