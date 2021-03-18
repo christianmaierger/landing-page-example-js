@@ -281,7 +281,9 @@ function respondToTheClick(evt) {
     // Basically `element_to_scroll_to` just have to be a reference
     // to any DOM element present on the page
     // Then:
-    element_to_scroll_to.scrollIntoView();
+    element_to_scroll_to.scrollIntoView({
+        behavior: "smooth"
+    });
 }
 
 
